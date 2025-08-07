@@ -21,11 +21,13 @@ jobs:
     name: Fetch docs from GCS
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -68,6 +70,9 @@ jobs:
             exit 1
           fi
 
+          echo "RESOLVED_BUCKET=$BUCKET" >> "$GITHUB_ENV"
+          echo "RESOLVED_PREFIX=$PREFIX" >> "$GITHUB_ENV"
+
           mkdir -p gcs_docs
           # Copy recursively from the prefix; tolerate missing prefixes
           gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/**" gcs_docs/ || true
@@ -76,9 +81,33 @@ jobs:
           # Remove metadata/administrative files to mimic app behavior
           find gcs_docs -type f \( -name "*.metadata.json" -o -name "project-info.json" -o -name "metadata.json" \) -print -delete || true
           # Remove folder placeholder files (used only to represent empty folders in GCS)
-          find gcs_docs -type f -name ".placeholder.md" -print -delete || true
+          find gcs_docs -type f -name ".folder-placeholder.md" -print -delete || true
           # Remove empty files
           find gcs_docs -type f -size 0 -print -delete || true
+
+      - name: Mirror into repo docs/ directory
+        run: |
+          set -euo pipefail
+          mkdir -p docs
+          rsync -a --delete gcs_docs/ docs/
+          echo "Mirrored GCS docs into ./docs"
+
+      - name: Commit and push changes
+        env:
+          BRANCH: ${{ github.ref_name }}
+          RESOLVED_BUCKET: ${{ env.RESOLVED_BUCKET }}
+          RESOLVED_PREFIX: ${{ env.RESOLVED_PREFIX }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(docs): mirror from GCS (${RESOLVED_BUCKET}/${RESOLVED_PREFIX})"
+          git push origin "HEAD:${BRANCH}"
 
       - name: List downloaded files
         run: |
