@@ -1,0 +1,93 @@
+name: GCS Docs Fetch
+
+on:
+  workflow_dispatch:
+    inputs:
+      gcs_bucket:
+        description: "GCS bucket (default: user_docs-prod)"
+        required: false
+        type: string
+      gcs_prefix:
+        description: "Prefix inside bucket (e.g., <userId>/docs). If empty and user_id is provided, uses <user_id>/docs"
+        required: false
+        type: string
+      user_id:
+        description: "User ID to fetch (used if gcs_prefix is empty)"
+        required: false
+        type: string
+
+jobs:
+  fetch-docs:
+    name: Fetch docs from GCS
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure GOOGLE_APPLICATION_CREDENTIALS and authenticate
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        run: |
+          set -euo pipefail
+          KEY_FILE="$RUNNER_TEMP/gcp-key.json"
+          # Write the JSON key to a temporary file
+          if printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | head -c1 | grep -q '{'; then
+            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$KEY_FILE"
+          else
+            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 -d > "$KEY_FILE"
+          fi
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          gcloud auth activate-service-account --key-file="$KEY_FILE"
+
+      - name: Verify gcloud
+        run: gcloud --version
+
+      - name: Download docs from GCS
+        env:
+          BUCKET_IN: ${{ inputs.gcs_bucket }}
+          PREFIX_IN: ${{ inputs.gcs_prefix }}
+          USER_ID: ${{ inputs.user_id }}
+        run: |
+          set -euo pipefail
+          # Resolve bucket and prefix with sensible defaults
+          BUCKET=${BUCKET_IN:-}
+          if [ -z "$BUCKET" ]; then BUCKET="user_docs-prod"; fi
+
+          if [ -n "${PREFIX_IN:-}" ]; then
+            PREFIX="$PREFIX_IN"
+          elif [ -n "${USER_ID:-}" ]; then
+            PREFIX="${USER_ID}/docs"
+          else
+            echo "Either gcs_prefix or user_id must be provided" >&2
+            exit 1
+          fi
+
+          mkdir -p gcs_docs
+          # Copy recursively from the prefix; tolerate missing prefixes
+          gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/**" gcs_docs/ || true
+          echo "Downloaded contents from gs://${BUCKET}/${PREFIX} into ./gcs_docs"
+
+          # Remove metadata/administrative files to mimic app behavior
+          find gcs_docs -type f \( -name "*.metadata.json" -o -name "project-info.json" -o -name "metadata.json" \) -print -delete || true
+          # Remove folder placeholder files (used only to represent empty folders in GCS)
+          find gcs_docs -type f -name ".placeholder.md" -print -delete || true
+          # Remove empty files
+          find gcs_docs -type f -size 0 -print -delete || true
+
+      - name: List downloaded files
+        run: |
+          echo "Contents of gcs_docs:";
+          ls -laR gcs_docs || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gcs-docs
+          path: gcs_docs
+
