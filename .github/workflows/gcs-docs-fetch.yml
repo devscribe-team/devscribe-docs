@@ -31,30 +31,20 @@ jobs:
 
       - name: Setup Google Credentials
         env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
           set -euo pipefail
           KEY_FILE="$RUNNER_TEMP/gcp-key.json"
           
-          echo "Secret length: ${#GOOGLE_APPLICATION_CREDENTIALS_JSON}"
-          echo "First 100 chars of secret: ${GOOGLE_APPLICATION_CREDENTIALS_JSON:0:100}"
-          echo "Last 100 chars of secret: ${GOOGLE_APPLICATION_CREDENTIALS_JSON: -100}"
+          echo "Secret length: ${#GOOGLE_APPLICATION_CREDENTIALS}"
           
-          # Write the JSON key to a temporary file
-          if printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | head -c1 | grep -q '{'; then
-            echo "Detected raw JSON, writing directly..."
-            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$KEY_FILE"
-          else
-            echo "Detected base64, decoding..."
-            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 -d > "$KEY_FILE"
-          fi
+          # Decode base64 and write to file (similar to your frontend approach)
+          echo "Decoding base64 credentials..."
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > "$KEY_FILE"
           
           echo "File size: $(wc -c < "$KEY_FILE") bytes"
           echo "File contents (first 200 chars):"
           head -c 200 "$KEY_FILE" || true
-          echo ""
-          echo "File contents (last 200 chars):"
-          tail -c 200 "$KEY_FILE" || true
           
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
           echo "Created key file at: $KEY_FILE"
