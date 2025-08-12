@@ -66,11 +66,8 @@ jobs:
           PREFIX_IN: ${{ inputs.gcs_prefix }}
           USER_ID: ${{ inputs.user_id }}
         run: |
-          set -euo pipefail
-          # Resolve bucket and prefix with sensible defaults
-          BUCKET=${BUCKET_IN:-}
-          if [ -z "$BUCKET" ]; then BUCKET="user_docs-prod"; fi
-
+          # Set bucket and prefix
+          BUCKET=${BUCKET_IN:-"user_docs-prod"}
           if [ -n "${PREFIX_IN:-}" ]; then
             PREFIX="$PREFIX_IN"
           elif [ -n "${USER_ID:-}" ]; then
@@ -80,117 +77,35 @@ jobs:
             exit 1
           fi
 
-          echo "RESOLVED_BUCKET=$BUCKET" >> "$GITHUB_ENV"
-          echo "RESOLVED_PREFIX=$PREFIX" >> "$GITHUB_ENV"
+          echo "Downloading from gs://${BUCKET}/${PREFIX}"
+          
+          # Just download everything
+          rm -rf gcs_docs
+          gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/*" gcs_docs/ 2>/dev/null || true
+          
+          echo "Downloaded:"
+          ls -la gcs_docs/
 
-          # Check if the prefix exists in the bucket
-          echo "Checking if gs://${BUCKET}/${PREFIX} exists..."
-          if gsutil ls "gs://${BUCKET}/${PREFIX}" >/dev/null 2>&1; then
-            echo "Prefix exists, downloading files..."
-            
-            # First, list all objects to see what we're working with
-            echo "Listing all objects in gs://${BUCKET}/${PREFIX}:"
-            gsutil ls -r "gs://${BUCKET}/${PREFIX}" || true
-            
-            # Create the target directory structure
-            mkdir -p gcs_docs
-            
-            # Copy recursively from the prefix - preserve directory structure
-            echo "Downloading all files and directories with structure preserved..."
-            
-            # Download everything from the prefix directly into gcs_docs
-            echo "Copying all contents from gs://${BUCKET}/${PREFIX}/ to gcs_docs/"
-            
-            # Use gsutil rsync for better mirroring
-            gsutil -m rsync -r -d "gs://${BUCKET}/${PREFIX}/" gcs_docs/ || {
-              echo "Rsync failed, trying cp approach..."
-              gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/*" gcs_docs/ || {
-                echo "Warning: Some files may not have been copied successfully"
-              }
-            }
-            
-            # List what we actually got
-            echo "Downloaded structure:"
-            find gcs_docs -type f -o -type d | sort
-            
-            echo "Downloaded contents from gs://${BUCKET}/${PREFIX} into ./gcs_docs"
-            
-            # Show the final structure
-            echo "Final directory structure:"
-            find gcs_docs -type f | sort
-          else
-            echo "Warning: Prefix gs://${BUCKET}/${PREFIX} does not exist or is not accessible"
-            echo "Creating empty gcs_docs directory for artifact upload"
-          fi
-
-          # Remove metadata/administrative files to mimic app behavior
-          find gcs_docs -type f \( -name "*.metadata.json" -o -name "project-info.json" -o -name "metadata.json" \) -print -delete || true
-          # Remove folder placeholder files (used only to represent empty folders in GCS)
-          find gcs_docs -type f -name ".folder-placeholder.md" -print -delete || true
-          # Remove empty files
-          find gcs_docs -type f -size 0 -print -delete || true
-
-      - name: Mirror into repo docs/ directory
+      - name: Mirror to docs directory
         run: |
-          set -euo pipefail
+          # Just overwrite everything
+          rm -rf docs
+          cp -r gcs_docs docs
           
-          # Remove existing docs directory to ensure clean sync
-          echo "Removing existing docs directory for clean sync..."
-          rm -rf docs/
-          
-          # Create fresh docs directory
-          mkdir -p docs
-          
-          echo "Contents of gcs_docs to be mirrored:"
-          find gcs_docs -type f | sort || true
-          
-          # Copy everything from gcs_docs to docs
-          if [ -d "gcs_docs" ] && [ "$(ls -A gcs_docs)" ]; then
-            cp -r gcs_docs/* docs/ 2>/dev/null || cp -r gcs_docs/. docs/ 2>/dev/null || true
-          fi
-          
-          echo "Contents of docs after sync:"
-          find docs -type f | sort || true
-          echo "Successfully synced GCS docs to ./docs"
+          echo "Docs folder now contains:"
+          ls -la docs/
 
-      - name: Commit and push changes
-        env:
-          BRANCH: ${{ github.ref_name }}
-          RESOLVED_BUCKET: ${{ env.RESOLVED_BUCKET }}
-          RESOLVED_PREFIX: ${{ env.RESOLVED_PREFIX }}
+      - name: Commit and push
         run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          echo "Current git status before staging:"
-          git status
+          # Force add everything
+          git add -A docs/
           
-          # Remove all tracked files in docs first (to handle deletions)
-          echo "Removing all tracked files in docs directory..."
-          git rm -rf docs/ --ignore-unmatch || true
-          
-          # Add the new state of docs
-          echo "Adding new docs directory state..."
-          git add docs/
-          
-          echo "Staged changes:"
-          git diff --cached --name-status || true
-          
-          echo "Number of files changed:"
-          git diff --cached --name-only | wc -l || echo "0"
-          
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          
-          echo "Committing changes..."
-          git commit -m "chore(docs): sync from GCS (${RESOLVED_BUCKET}/${RESOLVED_PREFIX})"
-          
-          echo "Pushing to ${BRANCH}..."
-          git push origin "HEAD:${BRANCH}"
-          echo "Successfully pushed changes!"
+          # Commit and force push
+          git commit -m "Update docs from GCS" || echo "No changes"
+          git push origin HEAD --force
 
       - name: List downloaded files
         run: |
