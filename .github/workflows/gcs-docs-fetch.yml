@@ -29,23 +29,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
       - name: Setup gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
-
-      - name: Configure GOOGLE_APPLICATION_CREDENTIALS and authenticate
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        run: |
-          set -euo pipefail
-          KEY_FILE="$RUNNER_TEMP/gcp-key.json"
-          # Write the JSON key to a temporary file
-          if printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | head -c1 | grep -q '{'; then
-            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$KEY_FILE"
-          else
-            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 -d > "$KEY_FILE"
-          fi
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          gcloud auth activate-service-account --key-file="$KEY_FILE"
 
       - name: Verify gcloud
         run: gcloud --version
@@ -74,9 +65,20 @@ jobs:
           echo "RESOLVED_PREFIX=$PREFIX" >> "$GITHUB_ENV"
 
           mkdir -p gcs_docs
-          # Copy recursively from the prefix; tolerate missing prefixes
-          gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/**" gcs_docs/ || true
-          echo "Downloaded contents from gs://${BUCKET}/${PREFIX} into ./gcs_docs"
+          
+          # Check if the prefix exists in the bucket
+          echo "Checking if gs://${BUCKET}/${PREFIX} exists..."
+          if gsutil ls "gs://${BUCKET}/${PREFIX}" >/dev/null 2>&1; then
+            echo "Prefix exists, downloading files..."
+            # Copy recursively from the prefix
+            gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/**" gcs_docs/ || {
+              echo "Warning: Some files may not have been copied successfully"
+            }
+            echo "Downloaded contents from gs://${BUCKET}/${PREFIX} into ./gcs_docs"
+          else
+            echo "Warning: Prefix gs://${BUCKET}/${PREFIX} does not exist or is not accessible"
+            echo "Creating empty gcs_docs directory for artifact upload"
+          fi
 
           # Remove metadata/administrative files to mimic app behavior
           find gcs_docs -type f \( -name "*.metadata.json" -o -name "project-info.json" -o -name "metadata.json" \) -print -delete || true
