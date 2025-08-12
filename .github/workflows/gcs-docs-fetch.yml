@@ -83,17 +83,29 @@ jobs:
           echo "RESOLVED_BUCKET=$BUCKET" >> "$GITHUB_ENV"
           echo "RESOLVED_PREFIX=$PREFIX" >> "$GITHUB_ENV"
 
-          mkdir -p gcs_docs
-          
           # Check if the prefix exists in the bucket
           echo "Checking if gs://${BUCKET}/${PREFIX} exists..."
           if gsutil ls "gs://${BUCKET}/${PREFIX}" >/dev/null 2>&1; then
             echo "Prefix exists, downloading files..."
-            # Copy recursively from the prefix
-            gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/**" gcs_docs/ || {
+            
+            # First, list all objects to see what we're working with
+            echo "Listing all objects in gs://${BUCKET}/${PREFIX}:"
+            gsutil ls -r "gs://${BUCKET}/${PREFIX}" || true
+            
+            # Create the target directory structure
+            mkdir -p gcs_docs
+            
+            # Copy recursively from the prefix - preserve directory structure
+            echo "Downloading all files and directories with structure preserved..."
+            gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/*" gcs_docs/ || {
               echo "Warning: Some files may not have been copied successfully"
             }
+            
             echo "Downloaded contents from gs://${BUCKET}/${PREFIX} into ./gcs_docs"
+            
+            # Show the final structure
+            echo "Final directory structure:"
+            find gcs_docs -type f | sort
           else
             echo "Warning: Prefix gs://${BUCKET}/${PREFIX} does not exist or is not accessible"
             echo "Creating empty gcs_docs directory for artifact upload"
@@ -110,7 +122,14 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p docs
-          rsync -a --delete gcs_docs/ docs/
+          echo "Contents of gcs_docs before rsync:"
+          find gcs_docs -type f | sort || true
+          
+          # Use rsync to mirror the structure
+          rsync -av --delete gcs_docs/ docs/
+          
+          echo "Contents of docs after rsync:"
+          find docs -type f | sort || true
           echo "Mirrored GCS docs into ./docs"
 
       - name: Commit and push changes
@@ -122,13 +141,27 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs
+          
+          echo "Current git status:"
+          git status
+          
+          echo "Staging docs directory:"
+          git add docs/
+          
+          echo "Staged changes:"
+          git diff --cached --name-only || true
+          
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
+          
+          echo "Committing changes..."
           git commit -m "chore(docs): mirror from GCS (${RESOLVED_BUCKET}/${RESOLVED_PREFIX})"
+          
+          echo "Pushing to ${BRANCH}..."
           git push origin "HEAD:${BRANCH}"
+          echo "Successfully pushed changes!"
 
       - name: List downloaded files
         run: |
