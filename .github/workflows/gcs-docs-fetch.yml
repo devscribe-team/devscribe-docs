@@ -29,11 +29,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Google Auth
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_SA_EMAIL }}
+      - name: Setup Google Credentials
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          set -euo pipefail
+          KEY_FILE="$RUNNER_TEMP/gcp-key.json"
+          # Write the JSON key to a temporary file
+          if printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | head -c1 | grep -q '{'; then
+            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$KEY_FILE"
+          else
+            printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 -d > "$KEY_FILE"
+          fi
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
+          echo "Created key file at: $KEY_FILE"
+          echo "Key file contents (first 100 chars):"
+          head -c 100 "$KEY_FILE" || true
+
+      - name: Authenticate with gcloud
+        run: |
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
+          gcloud config set project "$(jq -r '.project_id' $GOOGLE_APPLICATION_CREDENTIALS)"
 
       - name: Setup gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
