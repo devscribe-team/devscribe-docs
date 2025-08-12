@@ -98,22 +98,20 @@ jobs:
             # Copy recursively from the prefix - preserve directory structure
             echo "Downloading all files and directories with structure preserved..."
             
-            # First try to copy the entire prefix directory
-            echo "Attempting to copy entire prefix directory..."
-            gsutil -m cp -r "gs://${BUCKET}/${PREFIX}" gcs_docs/ || {
-              echo "Full prefix copy failed, trying alternative approach..."
-              # Alternative: copy contents recursively
+            # Download everything from the prefix directly into gcs_docs
+            echo "Copying all contents from gs://${BUCKET}/${PREFIX}/ to gcs_docs/"
+            
+            # Use gsutil rsync for better mirroring
+            gsutil -m rsync -r -d "gs://${BUCKET}/${PREFIX}/" gcs_docs/ || {
+              echo "Rsync failed, trying cp approach..."
               gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/*" gcs_docs/ || {
-                echo "Alternative copy also failed, trying individual files..."
-                # Last resort: copy files individually
-                gsutil ls -r "gs://${BUCKET}/${PREFIX}" | while read -r file; do
-                  if [[ "$file" != gs:// ]]; then
-                    echo "Copying: $file"
-                    gsutil cp "$file" "gcs_docs/${file#gs://${BUCKET}/${PREFIX}/}" || true
-                  fi
-                done
+                echo "Warning: Some files may not have been copied successfully"
               }
             }
+            
+            # List what we actually got
+            echo "Downloaded structure:"
+            find gcs_docs -type f -o -type d | sort
             
             echo "Downloaded contents from gs://${BUCKET}/${PREFIX} into ./gcs_docs"
             
