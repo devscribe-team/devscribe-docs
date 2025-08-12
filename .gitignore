@@ -7,3 +7,5 @@
 # Keep example env files tracked
 !.env.example
 !.env.*.example
+
+/docs
