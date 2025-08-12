@@ -8,17 +8,16 @@ on:
         required: false
         type: string
       gcs_prefix:
-        description: "Prefix inside bucket (e.g., <userId>/docs). If empty and user_id is provided, uses <user_id>/docs"
+        description: "Prefix (e.g., <userId>/docs). If empty and user_id is provided, uses <user_id>/docs"
         required: false
         type: string
       user_id:
-        description: "User ID to fetch (used if gcs_prefix is empty)"
+        description: "User ID (used if gcs_prefix is empty)"
         required: false
         type: string
 
 jobs:
   fetch-docs:
-    name: Fetch docs from GCS
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -29,45 +28,36 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Install gcloud before using it
+      - name: Setup gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      # Authenticate (keep your current method, but don't print the key)
       - name: Setup Google Credentials
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
           set -euo pipefail
           KEY_FILE="$RUNNER_TEMP/gcp-key.json"
-          
-          echo "Secret length: ${#GOOGLE_APPLICATION_CREDENTIALS}"
-          
-          # Decode base64 and write to file (similar to your frontend approach)
-          echo "Decoding base64 credentials..."
           echo "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > "$KEY_FILE"
-          
-          echo "File size: $(wc -c < "$KEY_FILE") bytes"
-          echo "File contents (first 200 chars):"
-          head -c 200 "$KEY_FILE" || true
-          
           echo "GOOGLE_APPLICATION_CREDENTIALS=$KEY_FILE" >> "$GITHUB_ENV"
-          echo "Created key file at: $KEY_FILE"
 
       - name: Authenticate with gcloud
         run: |
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
-          gcloud config set project "$(jq -r '.project_id' $GOOGLE_APPLICATION_CREDENTIALS)"
-
-      - name: Setup gcloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+          gcloud config set project "$(jq -r '.project_id' "$GOOGLE_APPLICATION_CREDENTIALS")"
 
       - name: Verify gcloud
         run: gcloud --version
 
-      - name: Download docs from GCS
+      - name: Download docs from GCS (mirror)
         env:
           BUCKET_IN: ${{ inputs.gcs_bucket }}
           PREFIX_IN: ${{ inputs.gcs_prefix }}
           USER_ID: ${{ inputs.user_id }}
         run: |
-          # Set bucket and prefix
-          BUCKET=${BUCKET_IN:-"user_docs-prod"}
+          set -euo pipefail
+          BUCKET=${BUCKET_IN:-user_docs-prod}
           if [ -n "${PREFIX_IN:-}" ]; then
             PREFIX="$PREFIX_IN"
           elif [ -n "${USER_ID:-}" ]; then
@@ -77,44 +67,45 @@ jobs:
             exit 1
           fi
 
-          echo "Downloading from gs://${BUCKET}/${PREFIX}"
-          
-          # Just download everything
           rm -rf gcs_docs
-          gsutil -m cp -r "gs://${BUCKET}/${PREFIX}/*" gcs_docs/ 2>/dev/null || true
-          
-          echo "Downloaded:"
-          ls -la gcs_docs/
+          mkdir -p gcs_docs
+          echo "Mirroring gs://${BUCKET}/${PREFIX}/ -> gcs_docs/"
+          # trailing slash => copy contents of prefix
+          gsutil -m rsync -r -d "gs://${BUCKET}/${PREFIX}/" gcs_docs/
 
-      - name: Mirror to docs directory
+          echo "Downloaded tree:"
+          find gcs_docs -print | sort || true
+
+      - name: Mirror to repo docs/
         run: |
-          # Just overwrite everything
+          set -euo pipefail
           rm -rf docs
-          cp -r gcs_docs docs
-          
-          echo "Docs folder now contains:"
-          ls -la docs/
+          mkdir -p docs
+          shopt -s dotglob
+          cp -r gcs_docs/. docs
+          echo "Repo docs/ now has:"
+          find docs -print | sort
 
       - name: Commit and push
+        env:
+          BRANCH: ${{ github.ref_name }}
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-          # Force add everything
-          git add -A docs/
-          
-          # Commit and force push
-          git commit -m "Update docs from GCS" || echo "No changes"
-          git push origin HEAD --force
 
-      - name: List downloaded files
-        run: |
-          echo "Contents of gcs_docs:";
-          ls -laR gcs_docs || true
+          git add -A docs/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update docs from gs://${{ inputs.gcs_bucket || 'user_docs-prod' }}/${{ inputs.gcs_prefix || format('{0}/docs', inputs.user_id) }}/"
+          # Force push if you really want to override; be sure branch protections allow it
+          git push origin "HEAD:${BRANCH}" --force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: gcs-docs
           path: gcs_docs
-
