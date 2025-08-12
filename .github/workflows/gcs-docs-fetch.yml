@@ -135,16 +135,25 @@ jobs:
       - name: Mirror into repo docs/ directory
         run: |
           set -euo pipefail
+          
+          # Remove existing docs directory to ensure clean sync
+          echo "Removing existing docs directory for clean sync..."
+          rm -rf docs/
+          
+          # Create fresh docs directory
           mkdir -p docs
-          echo "Contents of gcs_docs before rsync:"
+          
+          echo "Contents of gcs_docs to be mirrored:"
           find gcs_docs -type f | sort || true
           
-          # Use rsync to mirror the structure exactly
-          rsync -av --delete gcs_docs/ docs/
+          # Copy everything from gcs_docs to docs
+          if [ -d "gcs_docs" ] && [ "$(ls -A gcs_docs)" ]; then
+            cp -r gcs_docs/* docs/ 2>/dev/null || cp -r gcs_docs/. docs/ 2>/dev/null || true
+          fi
           
-          echo "Contents of docs after rsync:"
+          echo "Contents of docs after sync:"
           find docs -type f | sort || true
-          echo "Mirrored GCS docs into ./docs"
+          echo "Successfully synced GCS docs to ./docs"
 
       - name: Commit and push changes
         env:
@@ -156,16 +165,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          echo "Current git status:"
+          echo "Current git status before staging:"
           git status
           
-          echo "Staging entire docs directory:"
-          git add -A docs/
+          # Remove all tracked files in docs first (to handle deletions)
+          echo "Removing all tracked files in docs directory..."
+          git rm -rf docs/ --ignore-unmatch || true
+          
+          # Add the new state of docs
+          echo "Adding new docs directory state..."
+          git add docs/
           
           echo "Staged changes:"
-          git diff --cached --name-only || true
+          git diff --cached --name-status || true
           
-          echo "Number of files staged:"
+          echo "Number of files changed:"
           git diff --cached --name-only | wc -l || echo "0"
           
           if git diff --cached --quiet; then
@@ -174,7 +188,7 @@ jobs:
           fi
           
           echo "Committing changes..."
-          git commit -m "chore(docs): mirror from GCS (${RESOLVED_BUCKET}/${RESOLVED_PREFIX})"
+          git commit -m "chore(docs): sync from GCS (${RESOLVED_BUCKET}/${RESOLVED_PREFIX})"
           
           echo "Pushing to ${BRANCH}..."
           git push origin "HEAD:${BRANCH}"
