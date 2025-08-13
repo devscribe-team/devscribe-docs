@@ -1,1 +1,0 @@
-<p>fun delete stiff</p>
