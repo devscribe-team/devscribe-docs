@@ -1,1 +1,24 @@
-<p>{ "Essentials": [ { "name": "view_delete.md", "pretty_name": "view_delete" }, { "name": "view_origin.md", "pretty_name": "view_origin" }, { "name": "new-file.md", "pretty_name": "new-file" } ] }</p>
+{
+  "Essentials": [
+    {
+      "name": "view_delete.md",
+      "pretty_name": "view_delete"
+    },
+    {
+      "name": "view_origin.md",
+      "pretty_name": "view_origin"
+    },
+    {
+      "name": "fffd.md",
+      "pretty_name": "fffd"
+    },
+    {
+      "name": "vercel.md",
+      "pretty_name": "vercel"
+    },
+    {
+      "name": "new-file.md",
+      "pretty_name": "new-file"
+    }
+  ]
+}
