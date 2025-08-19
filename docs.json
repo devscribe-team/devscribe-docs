@@ -1,0 +1,78 @@
+{
+  "name": "devscribe",
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "development",
+              "generated/viewrobotspage"
+            ]
+          },
+          {
+            "group": "Essentials",
+            "pages": [
+              "essentials/components",
+              "essentials/markdown",
+              "essentials/code-blocks",
+              "essentials/images-and-embeds",
+              "essentials/global-settings",
+              "essentials/navigation",
+              "essentials/reusable-snippets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "api-reference/introduction",
+              "generated/viewpatch"
+            ]
+          },
+          {
+            "group": "Endpoint Examples",
+            "pages": [
+              "api-reference/endpoint/get",
+              "api-reference/endpoint/post",
+              "api-reference/endpoint/delete",
+              "api-reference/endpoint/put"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Generated",
+        "groups": [
+          {
+            "group": "Generated",
+            "pages": [
+              "viewhtmlpage"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Community",
+          "href": "https://mintlify.com/community",
+          "icon": "slack"
+        }
+      ]
+    }
+  },
+  "global": {
+    "anchors": []
+  }
+}
