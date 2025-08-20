@@ -37,7 +37,6 @@
             "pages": [
               "api-reference/introduction",
               "api-reference/endpoint/get",
-              "api-reference/endpoint/post",
               "api-reference/endpoint/delete",
               "api-reference/endpoint/put"
             ]
