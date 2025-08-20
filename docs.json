@@ -37,8 +37,7 @@
             "pages": [
               "api-reference/introduction",
               "generated/viewpatch",
-              "generated/viewheaders",
-              "generated/vieworigin"
+              "generated/viewheaders"
             ]
           },
           {
