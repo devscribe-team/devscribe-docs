@@ -36,10 +36,10 @@
             "group": "API Documentation",
             "pages": [
               "api-reference/introduction",
-              "generated/viewpatch",
               "generated/viewheaders",
               "generated/redirectntimes",
-              "generated/viewget"
+              "generated/viewget",
+              "generated/set_cookie"
             ]
           },
           {
