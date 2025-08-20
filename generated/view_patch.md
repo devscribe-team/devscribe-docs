@@ -7,7 +7,7 @@ description: "This endpoint is bound to the `/patch` route and specifically hand
   \ headers, any multipart files, and the JSON payload\u2014into a single JSON response."
 openapi: PATCH ['/patch']
 ---
-# view_patch
+# view_patch modified
 
 **Source:** [Link](https://github.com/devscribe-team/httpbin/blob/complex/httpbin/core.py#L450-L465)
 
