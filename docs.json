@@ -36,17 +36,9 @@
             "group": "API Documentation",
             "pages": [
               "api-reference/introduction",
-              "generated/viewheaders",
-              "generated/redirectntimes",
-              "generated/viewget",
-              "generated/set_cookie"
-            ]
-          },
-          {
-            "group": "Endpoint Examples",
-            "pages": [
+              "g
               "api-reference/endpoint/get",
-              "api-reference/endpoint/post"
+              "api-reference/endpoint/post",
               "api-reference/endpoint/delete",
               "api-reference/endpoint/put"
             ]
