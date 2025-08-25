@@ -12,7 +12,7 @@
               "introduction",
               "quickstart",
               "development",
-"new"
+              "new"
             ]
           },
           {
@@ -35,7 +35,8 @@
           {
             "group": "API Documentation",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/introduction",
+              "generated/view_landing_page"
             ]
           },
           {
