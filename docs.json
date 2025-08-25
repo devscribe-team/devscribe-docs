@@ -12,8 +12,7 @@
               "introduction",
               "quickstart",
               "development",
-              "generated/viewrobotspage"
-, "modified"
+"new"
             ]
           },
           {
@@ -36,11 +35,7 @@
           {
             "group": "API Documentation",
             "pages": [
-              "api-reference/introduction",
-              "generated/viewheaders",
-              "generated/redirectntimes",
-              "generated/viewget",
-              "generated/set_cookie"
+              "api-reference/introduction"
             ]
           },
           {
@@ -50,17 +45,6 @@
               "api-reference/endpoint/post",
               "api-reference/endpoint/delete",
               "api-reference/endpoint/put"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Generated",
-        "groups": [
-          {
-            "group": "Generated",
-            "pages": [
-              "viewhtmlpage"
             ]
           }
         ]
