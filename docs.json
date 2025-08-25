@@ -37,7 +37,8 @@
             "pages": [
               "api-reference/introduction",
               "generated/view_landing_page",
-              "generated/view_html_page"
+              "generated/view_html_page",
+              "generated/redirect_to"
             ]
           },
           {
