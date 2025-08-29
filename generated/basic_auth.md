@@ -7,7 +7,7 @@ description: This API endpoint validates HTTP Basic Authentication credentials p
   a 401 Unauthorized status code.
 openapi: GET ['/basic-auth/<user>/<passwd>']
 ---
-updated
+updated 2
 
 ## Summary
 This API endpoint validates HTTP Basic Authentication credentials provided through the `user` and `passwd` path parameters. It checks the supplied credentials and, if they are valid, returns a JSON object confirming successful authentication along with the username. If the authentication fails, the endpoint responds with a 401 Unauthorized status code.
