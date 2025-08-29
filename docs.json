@@ -39,7 +39,8 @@
               "generated/view_landing_page",
               "generated/view_html_page",
               "generated/redirect_to",
-              "generated/basic_auth"
+              "generated/basic_auth",
+              "generated/redirect_n_times"
             ]
           },
           {
