@@ -1,71 +1,75 @@
 ---
 title: view_landing_page
-description: This endpoint, available at the `/legacy` route, is responsible for generating
-  our legacy landing page by rendering and returning the `index.html` template.
+description: This function handles GET requests for the `/legacy` endpoint by rendering
+  and returning the `index.html` template. This route provides a legacy layout for
+  the application's main landing page.
 openapi: GET ['/legacy']
 ---
 # view_landing_page
 
 {% callout type="tip" %}
-**Source:** [View on GitHub](https://github.com/devscribe-team/httpbin/blob/master/httpbin/core.py#L240-L243)
+View source on [**GitHub ↗**](https://github.com/devscribe-team/httpbin/blob/master/httpbin/core.py#L240-L243)
 {% /callout %}
 
 ## Summary
-This endpoint, available at the `/legacy` route, is responsible for generating our legacy landing page by rendering and returning the `index.html` template. modification
+This function handles GET requests for the `/legacy` endpoint by rendering and returning the `index.html` template. This route provides a legacy layout for the application's main landing page.
 
 ## API Info
 {% cardGroup cols=2 %}
-{% card title="HTTP Methods" icon="server" %}
+{% card title="HTTP Methods" icon="server" description="" %}
 `GET`
 {% /card %}
-{% card title="Route Path" icon="route" %}
+{% card title="Route Path" icon="route" description="" %}
 `/legacy`
 {% /card %}
 {% /cardGroup %}
 
+## Parameters
+{% callout type="info" %}
+No parameters.
+{% /callout %}
+
+## Returns
+`render_template`: The function returns a call to `render_template`, which is used to render a template into a response object.
+
 ## Usage Examples
 {% codeGroup %}
-```python {% title="Python" %}
+```python {% title="Python" showLineNumbers=true %}
 import requests
 
-url = "https://api.example.com/legacy"
-response = requests.get(url)
+response = requests.get("https://api.example.com/legacy")
 
-print(response.status_code)
 print(response.text)
 ```
 
-```javascript {% title="JavaScript" %}
+```javascript {% title="JavaScript" showLineNumbers=true %}
 fetch("https://api.example.com/legacy")
   .then(response => response.text())
   .then(html => console.log(html))
   .catch(error => console.error("Error:", error));
 ```
 
-```java {% title="Java" %}
-import java.io.IOException;
+```java {% title="Java" showLineNumbers=true %}
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class Main {
-    public static void main(String[] args) {
+public class Example {
+    public static void main(String[] args) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.example.com/legacy"))
                 .build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println(response.body());
     }
 }
 ```
 
-```php {% title="PHP" %}
+```php {% title="PHP" showLineNumbers=true %}
 <?php
 
 $curl = curl_init();
@@ -73,17 +77,26 @@ $curl = curl_init();
 curl_setopt_array($curl, [
   CURLOPT_URL => "https://api.example.com/legacy",
   CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "GET",
 ]);
 
 $response = curl_exec($curl);
+$err = curl_error($curl);
 
 curl_close($curl);
 
-echo $response;
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
-```go {% title="Go" %}
+```go {% title="GO" showLineNumbers=true %}
 package main
 
 import (
@@ -95,28 +108,22 @@ import (
 func main() {
 	resp, err := http.Get("https://api.example.com/legacy")
 	if err != nil {
-		panic(err)
+		fmt.Println("Error:", err)
+		return
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error:", err)
+		return
 	}
 
 	fmt.Println(string(body))
 }
 ```
 
-```bash {% title="cURL" %}
-curl -X GET "https://api.example.com/legacy"
+```bash {% title="cURL" showLineNumbers=true %}
+curl "https://api.example.com/legacy"
 ```
 {% /codeGroup %}
-
-## Parameters
-{% callout type="info" %}
-No parameters.
-{% /callout %}
-
-## Returns
-`render_template`: Renders a template from the templates folder.

@@ -8,7 +8,7 @@ description: This endpoint performs a 3xx redirect to a user-specified URL. It r
   request.
 openapi: GET, POST, PUT, DELETE, PATCH, TRACE ['/redirect-to']
 ---
-# redirect_to
+# Header 1
 
 {% callout type="tip" %}
 **Source:** [View on GitHub](https://github.com/devscribe-team/httpbin/blob/master/httpbin/core.py#L576-L648)
