@@ -1,102 +1,104 @@
 ---
 title: view_html_page
-description: This API endpoint handles GET requests to the `/html` route, serving
-  a simple HTML document. It renders a predefined static template, providing a basic
-  `text/html` response for client testing purposes.
+description: This function defines the `/html` endpoint, which responds to GET requests
+  by rendering and returning the `moby.html` template as a simple HTML document. For
+  debugging purposes, it also prints the incoming request headers to the server's
+  console.
 openapi: GET ['/html']
 ---
 # view_html_page
 
 {% callout type="tip" %}
-**Source:** [View on GitHub](https://github.com/devscribe-team/httpbin/blob/master/httpbin/core.py#L246-L259)
+View source on [**GitHub ↗**](https://github.com/devscribe-team/httpbin/blob/master/httpbin/core.py#L246-L263)
 {% /callout %}
 
 ## Summary
-This API endpoint handles GET requests to the `/html` route, serving a simple HTML document. It renders a predefined static template, providing a basic `text/html` response for client testing purposes.
+This function defines the `/html` endpoint, which responds to GET requests by rendering and returning the `moby.html` template as a simple HTML document. For debugging purposes, it also prints the incoming request headers to the server's console.
 
 ## API Info
 {% cardGroup cols=2 %}
-{% card title="HTTP Methods" icon="server" %}
-GET
-{% /card %}
-{% card title="Route Path" icon="route" %}
-`/html`
-{% /card %}
+  {% card title="HTTP Methods" icon="server" description="" %}
+  `GET`
+  {% /card %}
+  {% card title="Route Path" icon="route" description="" %}
+  `/html`
+  {% /card %}
 {% /cardGroup %}
+
+## Parameters
+{% callout type="info" %}
+No parameters.
+{% /callout %}
+
+## Returns
+`render_template()`: A function that renders a template into an HTML string.
 
 ## Usage Examples
 {% codeGroup %}
-```python {% title="Python" %}
+```python {% title="Python" showLineNumbers=true %}
 import requests
 
-url = "https://api.example.com/html"
-response = requests.get(url)
+response = requests.get("https://api.example.com/html")
 
-print(f"Status Code: {response.status_code}")
-print(f"Content-Type: {response.headers['Content-Type']}")
-print("Response Body:")
 print(response.text)
 ```
 
-```javascript {% title="JavaScript" %}
-fetch("https://api.example.com/html")
-  .then(response => response.text())
-  .then(data => console.log(data))
-  .catch(error => console.error("Error:", error));
+```javascript {% title="JavaScript" showLineNumbers=true %}
+async function getHtml() {
+  const response = await fetch("https://api.example.com/html");
+  const html = await response.text();
+  console.log(html);
+}
+
+getHtml();
 ```
 
-```java {% title="Java" %}
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+```java {% title="Java" showLineNumbers=true %}
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class Example {
-    public static void main(String[] args) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.example.com/html"))
-                .header("Accept", "text/html")
-                .build();
+    public static void main(String[] args) {
+        try {
+            URL url = new URL("https://api.example.com/html");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            int status = con.getResponseCode();
+            System.out.println("Response Code: " + status);
 
-        System.out.println(response.statusCode());
-        System.out.println(response.body());
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+
+            System.out.println("Response Body: " + content.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 ```
 
-```php {% title="PHP" %}
+```php {% title="PHP" showLineNumbers=true %}
 <?php
 
-$curl = curl_init();
+$ch = curl_init("https://api.example.com/html");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+curl_close($ch);
+echo $response;
 
-curl_setopt_array($curl, [
-  CURLOPT_URL => "https://api.example.com/html",
-  CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_ENCODING => "",
-  CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 30,
-  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => "GET",
-]);
-
-$response = curl_exec($curl);
-$err = curl_error($curl);
-
-curl_close($curl);
-
-if ($err) {
-  echo "cURL Error #:" . $err;
-} else {
-  echo $response;
-}
-
+?>
 ```
 
-```go {% title="GO" %}
+```go {% title="Go" showLineNumbers=true %}
 package main
 
 import (
@@ -109,29 +111,24 @@ import (
 func main() {
 	resp, err := http.Get("https://api.example.com/html")
 	if err != nil {
-		log.Fatalf("error making request: %s", err)
+		log.Fatalf("Error fetching URL: %v", err)
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("Error: received status code %d", resp.StatusCode)
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("error reading response body: %s", err)
+		log.Fatalf("Error reading response body: %v", err)
 	}
 
 	fmt.Println(string(body))
 }
-
 ```
 
-```bash {% title="cURL" %}
-curl -H "Accept: text/html" "https://api.example.com/html"
+```bash {% title="cURL" showLineNumbers=true %}
+curl -X GET "https://api.example.com/html"
 ```
 {% /codeGroup %}
-
-## Parameters
-{% callout type="info" %}
-No parameters.
-{% /callout %}
-
-## Returns
-`render_template()`: Renders a template from the template folder with the given context.

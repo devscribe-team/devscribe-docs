@@ -1,22 +1,22 @@
 ---
 title: redirect_n_times
-description: This endpoint initiates a sequence of `n` HTTP 302 redirects, where `n`
-  is an integer specified in the URL path. The final redirect in the chain resolves
-  to the `/get` endpoint. A boolean query parameter, `absolute`, can be provided to
-  control whether the intermediate redirects use absolute or relative URLs.
+description: This API endpoint initiates a chain of `n` HTTP 302 redirects, where
+  `n` is an integer specified in the URL path. The final destination of the redirect
+  chain is the `/get` endpoint. By default, the redirects use relative URLs. To use
+  absolute URLs, an optional `absolute` query parameter can be set to `true`.
 openapi: GET ['/redirect/<int:n>']
 ---
-# Header 1
+# redirect_n_times
 
 {% callout type="tip" %}
 View source on [**GitHub ↗**](https://github.com/devscribe-team/httpbin/blob/master/httpbin/core.py#L541-L567)
 {% /callout %}
 
 ## Summary
-This endpoint initiates a sequence of `n` HTTP 302 redirects, where `n` is an integer specified in the URL path. The final redirect in the chain resolves to the `/get` endpoint. A boolean query parameter, `absolute`, can be provided to control whether the intermediate redirects use absolute or relative URLs.
+This API endpoint initiates a chain of `n` HTTP 302 redirects, where `n` is an integer specified in the URL path. The final destination of the redirect chain is the `/get` endpoint. By default, the redirects use relative URLs. To use absolute URLs, an optional `absolute` query parameter can be set to `true`.
 
 ## API Info
-{% cardGroup cols=2 %}
+{% cardGroup cols=2 gap="sm" %}
 {% card title="HTTP Methods" icon="server" %}
 `GET`
 {% /card %}
@@ -29,47 +29,56 @@ This endpoint initiates a sequence of `n` HTTP 302 redirects, where `n` is an in
 {% parameterField name="n" type="integer" required=true %}
 An integer that specifies the number of times to redirect.
 {% /parameterField %}
-
-{% parameterField name="absolute" type="boolean" %}
-An optional query parameter that makes the redirection absolute. Defaults to `false`.
+{% parameterField name="absolute" type="boolean" default="false" %}
+An optional query parameter that determines if the redirect is absolute.
 {% /parameterField %}
 
 ## Returns
-`redirect` or `_redirect`: Returns a call to the `redirect` function for a single redirection or the `_redirect` function for multiple redirections.
+`redirect` or `_redirect`: Returns a function call to either `redirect` or `_redirect`, both of which generate a 302 redirect response.
 
 ## Usage Examples
 {% codeGroup %}
 ```python {% title="Python" showLineNumbers=true %}
 import requests
 
-response = requests.get("https://api.example.com/redirect/3")
+url = "https://api.example.com/redirect/5"
+params = {"absolute": "true"}
+response = requests.get(url, params=params)
 
 print(response.status_code)
-print(response.history)
+print(response.url)
 ```
 ```javascript {% title="JavaScript" showLineNumbers=true %}
-async function performRedirect() {
-  const response = await fetch("https://api.example.com/redirect/4");
-  const finalUrl = response.url;
-  console.log(`Landed at: ${finalUrl}`);
-  return finalUrl;
-}
-
-performRedirect();
+fetch("https://api.example.com/redirect/5?absolute=true")
+  .then(response => response.text())
+  .then(data => console.log(data))
+  .catch(error => console.error("Error:", error));
 ```
 ```java {% title="Java" showLineNumbers=true %}
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class RedirectExample {
-    public static void main(String[] args) throws Exception {
-        URL url = new URL("https://api.example.com/redirect/5");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setInstanceFollowRedirects(false);
+    public static void main(String[] args) {
+        try {
+            URL url = new URL("https://api.example.com/redirect/5");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setInstanceFollowRedirects(false);
 
-        int statusCode = connection.getResponseCode();
-        String locationHeader = connection.getHeaderField("Location");
+            int status = connection.getResponseCode();
+
+            if (status == HttpURLConnection.HTTP_MOVED_TEMP) {
+                String newUrl = connection.getHeaderField("Location");
+                System.out.println("Redirected to URL: " + newUrl);
+            }
+
+            connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 ```
@@ -78,10 +87,12 @@ public class RedirectExample {
 
 $ch = curl_init();
 
-curl_setopt($ch, CURLOPT_URL, "https://api.example.com/redirect/5");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+curl_setopt_array($ch, [
+    CURLOPT_URL => "https://api.example.com/redirect/5",
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_MAXREDIRS => 5,
+]);
 
 $response = curl_exec($ch);
 
@@ -91,42 +102,39 @@ echo $response;
 
 ?>
 ```
-```go {% title="Go" showLineNumbers=true %}
+```go {% title="GO" showLineNumbers=true %}
 package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 )
 
 func main() {
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
+	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", "https://api.example.com/redirect/5", nil)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error creating request:", err)
 		return
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error making request:", err)
 		return
 	}
 	defer resp.Body.Close()
 
-	fmt.Printf("Status: %s\n", resp.Status)
-
-	location, err := resp.Location()
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error reading response body:", err)
 		return
 	}
-	fmt.Printf("Location: %s\n", location)
+
+	fmt.Printf("Status Code: %d\n", resp.StatusCode)
+	fmt.Printf("Response Body: %s\n", string(body))
 }
 ```
 ```bash {% title="cURL" showLineNumbers=true %}

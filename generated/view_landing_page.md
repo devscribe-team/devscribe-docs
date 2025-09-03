@@ -1,8 +1,8 @@
 ---
 title: view_landing_page
-description: This function handles GET requests for the `/legacy` endpoint by rendering
-  and returning the `index.html` template. This route provides a legacy layout for
-  the application's main landing page.
+description: This function serves as the endpoint for the `/legacy` route. It renders
+  and returns the `index.html` template, which displays the landing page in its legacy
+  layout.
 openapi: GET ['/legacy']
 ---
 # view_landing_page
@@ -12,14 +12,14 @@ View source on [**GitHub ↗**](https://github.com/devscribe-team/httpbin/blob/m
 {% /callout %}
 
 ## Summary
-This function handles GET requests for the `/legacy` endpoint by rendering and returning the `index.html` template. This route provides a legacy layout for the application's main landing page.
+This function serves as the endpoint for the `/legacy` route. It renders and returns the `index.html` template, which displays the landing page in its legacy layout.
 
 ## API Info
 {% cardGroup cols=2 %}
-{% card title="HTTP Methods" icon="server" description="" %}
+{% card title="HTTP Methods" icon="server" %}
 `GET`
 {% /card %}
-{% card title="Route Path" icon="route" description="" %}
+{% card title="Route Path" icon="route" %}
 `/legacy`
 {% /card %}
 {% /cardGroup %}
@@ -30,25 +30,26 @@ No parameters.
 {% /callout %}
 
 ## Returns
-`render_template`: The function returns a call to `render_template`, which is used to render a template into a response object.
+`render_template`: Renders a Jinja2 template to an HTML string.
 
 ## Usage Examples
 {% codeGroup %}
 ```python {% title="Python" showLineNumbers=true %}
 import requests
 
-response = requests.get("https://api.example.com/legacy")
+url = "https://api.example.com/legacy"
+response = requests.get(url)
 
 print(response.text)
 ```
-
 ```javascript {% title="JavaScript" showLineNumbers=true %}
-fetch("https://api.example.com/legacy")
-  .then(response => response.text())
-  .then(html => console.log(html))
-  .catch(error => console.error("Error:", error));
+fetch("https://api.example.com/legacy", {
+    method: "GET"
+})
+.then(response => response.text())
+.then(data => console.log(data))
+.catch(error => console.error("Error:", error));
 ```
-
 ```java {% title="Java" showLineNumbers=true %}
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -60,6 +61,7 @@ public class Example {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.example.com/legacy"))
+                .GET()
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -68,7 +70,6 @@ public class Example {
     }
 }
 ```
-
 ```php {% title="PHP" showLineNumbers=true %}
 <?php
 
@@ -95,34 +96,31 @@ if ($err) {
   echo $response;
 }
 ```
-
 ```go {% title="GO" showLineNumbers=true %}
 package main
 
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
 func main() {
 	resp, err := http.Get("https://api.example.com/legacy")
 	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		log.Fatalf("error making request: %s", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		log.Fatalf("error reading response body: %s", err)
 	}
 
 	fmt.Println(string(body))
 }
 ```
-
 ```bash {% title="cURL" showLineNumbers=true %}
 curl "https://api.example.com/legacy"
 ```
