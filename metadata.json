@@ -1,0 +1,128 @@
+{
+  "lastUpdated": "2025-08-20T21:03:38.762Z",
+  "totalFiles": 7,
+  "markdownFiles": 6,
+  "treeStructure": {
+    "generated": {
+      "index": "generated",
+      "canMove": true,
+      "isFolder": true,
+      "children": [
+        "generated/redirect_n_times.md",
+        "generated/set_cookie.md",
+        "generated/view_get.md",
+        "generated/view_headers.md"
+      ],
+      "data": "generated",
+      "canRename": true,
+      "status": "deployed"
+    },
+    "root": {
+      "index": "root",
+      "canMove": false,
+      "isFolder": true,
+      "children": [
+        "generated",
+        "docs.json",
+        "modified.md",
+        "testmetadata.md"
+      ],
+      "data": "Docs",
+      "canRename": false,
+      "canDrop": true,
+      "status": "modified"
+    },
+    "EiJUNXi0E9M7G2ZW2BlG/docs/docs.json": {
+      "index": "EiJUNXi0E9M7G2ZW2BlG/docs/docs.json",
+      "canMove": false,
+      "isFolder": false,
+      "children": [],
+      "data": "docs.json",
+      "canRename": false,
+      "uid": "docs.json",
+      "status": "deployed",
+      "createdAt": "2025-08-20T18:23:07.681Z",
+      "lastModified": "2025-08-20T21:03:38.761Z",
+      "lastDeployed": "2025-08-20T21:03:50.428Z"
+    },
+    "EiJUNXi0E9M7G2ZW2BlG/docs/generated/redirect_n_times.md": {
+      "index": "EiJUNXi0E9M7G2ZW2BlG/docs/generated/redirect_n_times.md",
+      "canMove": true,
+      "isFolder": false,
+      "children": [],
+      "data": "redirect_n_times.md",
+      "canRename": true,
+      "uid": "88d6abcf1078d0f92dbbd2823b3d54a2",
+      "status": "deployed",
+      "createdAt": "2025-08-20T17:47:06.136Z",
+      "lastModified": "2025-08-20T21:03:38.762Z",
+      "lastDeployed": "2025-08-20T21:03:50.428Z"
+    },
+    "EiJUNXi0E9M7G2ZW2BlG/docs/generated/set_cookie.md": {
+      "index": "EiJUNXi0E9M7G2ZW2BlG/docs/generated/set_cookie.md",
+      "canMove": true,
+      "isFolder": false,
+      "children": [],
+      "data": "set_cookie.md",
+      "canRename": true,
+      "uid": "65a5be3573dd4bbb1ba495225f5745ac",
+      "status": "deployed",
+      "createdAt": "2025-08-20T18:23:07.681Z",
+      "lastModified": "2025-08-20T21:03:38.762Z",
+      "lastDeployed": "2025-08-20T21:03:50.428Z"
+    },
+    "EiJUNXi0E9M7G2ZW2BlG/docs/generated/view_get.md": {
+      "index": "EiJUNXi0E9M7G2ZW2BlG/docs/generated/view_get.md",
+      "canMove": true,
+      "isFolder": false,
+      "children": [],
+      "data": "view_get.md",
+      "canRename": true,
+      "uid": "10c24c2e11ae6e792bcb01c66df0ee55",
+      "status": "deployed",
+      "createdAt": "2025-08-20T17:55:29.839Z",
+      "lastModified": "2025-08-20T21:03:38.762Z",
+      "lastDeployed": "2025-08-20T21:03:50.428Z"
+    },
+    "EiJUNXi0E9M7G2ZW2BlG/docs/generated/view_headers.md": {
+      "index": "EiJUNXi0E9M7G2ZW2BlG/docs/generated/view_headers.md",
+      "canMove": true,
+      "isFolder": false,
+      "children": [],
+      "data": "view_headers.md",
+      "canRename": true,
+      "uid": "f4ca92051e17cea92a4e56212ecab7c5",
+      "status": "deployed",
+      "createdAt": "2025-08-20T17:12:53.995Z",
+      "lastModified": "2025-08-20T21:03:38.762Z",
+      "lastDeployed": "2025-08-20T21:03:50.428Z"
+    },
+    "EiJUNXi0E9M7G2ZW2BlG/docs/modified.md": {
+      "index": "EiJUNXi0E9M7G2ZW2BlG/docs/modified.md",
+      "canMove": true,
+      "isFolder": false,
+      "children": [],
+      "data": "modified.md",
+      "canRename": true,
+      "uid": "modified",
+      "status": "deployed",
+      "createdAt": "2025-08-19T22:52:48.956Z",
+      "lastModified": "2025-08-20T21:03:38.762Z",
+      "lastDeployed": "2025-08-20T21:03:50.428Z"
+    },
+    "EiJUNXi0E9M7G2ZW2BlG/docs/testmetadata.md": {
+      "index": "EiJUNXi0E9M7G2ZW2BlG/docs/testmetadata.md",
+      "canMove": true,
+      "isFolder": false,
+      "children": [],
+      "data": "testmetadata.md",
+      "canRename": true,
+      "uid": "testmetadata",
+      "status": "deployed",
+      "createdAt": "2025-08-20T17:58:01.062Z",
+      "lastModified": "2025-08-20T21:03:38.762Z",
+      "lastDeployed": "2025-08-20T21:03:50.428Z"
+    }
+  },
+  "lastDeployed": "2025-08-20T21:03:50.428Z"
+}
