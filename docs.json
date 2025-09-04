@@ -42,7 +42,8 @@
               "generated/basic_auth",
               "generated/redirect_n_times",
               "generated/view_robots_page",
-              "generated/view_post"
+              "generated/view_post",
+              "generated/a"
             ]
           },
           {
