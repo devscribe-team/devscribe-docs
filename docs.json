@@ -29,8 +29,7 @@
             "group": "API Documentation",
             "pages": [
               "api-reference/introduction",
-              "generated/set_cookie",
-              "generated/redirect_to"
+              "generated/set_cookie"
             ]
           },
           {
