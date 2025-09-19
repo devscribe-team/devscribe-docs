@@ -1,57 +1,60 @@
 {
-    "name": "devscribe",
-    "favicon": "/favicon.svg",
-    "navigation": {
-      "tabs": [
-        {
-          "tab": "Guides",
-          "groups": [
-            {
-              "group": "Get Started",
-              "pages": [
-                "introduction"
-              ]
-            },
-            {
-              "group": "Quickstart",
-              "pages": [
-                "quickstart/guide",
-                "quickstart/docs-json",
-                "quickstart/openapi-json"
-              ]
-            }
-          ]
-        },
-        {
-          "tab": "API Reference",
-          "groups": [
-            {
-              "group": "API Documentation",
-              "pages": [
-                "api-reference/introduction"
-              ]
-            },
-            {
-              "group": "Endpoints",
-              "pages": [
-                "api-reference/endpoint/get",
-                "api-reference/endpoint/post",
-                "api-reference/endpoint/delete",
-                "api-reference/endpoint/put"
-              ]
-            }
-          ]
-        }
-      ],
-
-      "global": {
-        "anchors": [
+  "name": "devscribe",
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
           {
-            "anchor": "Community",
-            "href": "https://mintlify.com/community",
-            "icon": "slack"
+            "group": "Get Started",
+            "pages": [
+              "introduction"
+            ]
+          },
+          {
+            "group": "Quickstart",
+            "pages": [
+              "quickstart/guide",
+              "quickstart/docs-json",
+              "quickstart/openapi-json"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "api-reference/introduction",
+              "generated/set_cookie"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/get",
+              "api-reference/endpoint/post",
+              "api-reference/endpoint/delete",
+              "api-reference/endpoint/put"
+            ]
           }
         ]
       }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Community",
+          "href": "https://mintlify.com/community",
+          "icon": "slack"
+        }
+      ]
     }
+  },
+  "global": {
+    "anchors": []
   }
+}
