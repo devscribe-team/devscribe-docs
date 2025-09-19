@@ -4,7 +4,8 @@ description: This endpoint sets a cookie using a name and value provided in the 
   path. After the cookie is successfully set on the response, the client is redirected
   to the endpoint for viewing all cookies. The cookie's `secure` flag is set based
   on the request's scheme.
-openapi: GET ['/cookies/set/<name>/<value>']
+api: GET /cookies/set/<name>/<value>
+num: 1
 ---
 ## Summary
 This endpoint sets a cookie using a name and value provided in the URL path. After the cookie is successfully set on the response, the client is redirected to the endpoint for viewing all cookies. The cookie's `secure` flag is set based on the request's scheme.
