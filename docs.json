@@ -9,8 +9,7 @@
           {
             "group": "Get Started",
             "pages": [
-              "introduction",
-              "generated/redirect_to"
+              "introduction"
             ]
           },
           {
