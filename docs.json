@@ -30,7 +30,8 @@
             "pages": [
               "api-reference/introduction",
               "generated/set_cookie",
-              "generated/a"
+              "generated/a",
+              "generated/users_name"
             ]
           },
           {
