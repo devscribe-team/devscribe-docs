@@ -1,0 +1,51 @@
+Based on my analysis of the devscribe-backend project, I can see this is a FastAPI-based backend service that handles documentation generation, authentication, GitHub integration, and related features. Here's the frontmatter:
+
+---
+title: Backend Overview
+icon: book
+---
+## General Use
+
+DevScribe is an AI-native documentation platform that automatically generates, maintains, and publishes API documentation. The platform connects to your GitHub repositories, analyzes your codebase, and creates comprehensive documentation that updates automatically as your code evolves.
+
+## Core Functionality
+
+**Automated Documentation Generation**
+
+Connect your GitHub repository and select a documentation type (API Reference, Internal, or External). The AI analyzes your code and generates structured documentation instantly.
+
+<Callout type="tip">
+The AI can detect your project's structure and technology stack to generate context-aware documentation that follows best practices for your specific framework.
+</Callout>
+
+**Web-Based Editor**
+
+Edit documentation through a rich markdown editor with file tree navigation, syntax highlighting, and live preview. The editor supports standard markdown, MDX with React components, and Markdoc for advanced formatting.
+
+<Callout type="info">
+The editor supports **three content formats**: standard Markdown for simple documentation, MDX for embedding React components, and Markdoc for advanced structured content.
+</Callout>
+
+**Continuous Sync**
+
+Documentation automatically updates when code is pushed to GitHub. The platform monitors repository changes and regenerates relevant sections to keep docs in sync with your codebase.
+
+<Callout type="success">
+Never worry about outdated documentation again. DevScribe automatically detects changes and updates the relevant sections while preserving your custom content.
+</Callout>
+
+**Custom Publishing**
+
+Deploy documentation to Vercel or custom domains with configurable themes, color schemes, and branding. Each platform maintains its own published website.
+
+**Team Collaboration**
+
+Invite team members to collaborate on documentation with role-based permissions. Organizations can manage multiple platforms with separate teams and content repositories.
+
+## Technology Stack
+
+Built with Next.js 15, React 19, and TypeScript. Uses Supabase for authentication and data management, Google Cloud Storage for file storage, and integrates with GitHub for repository access and automated deployments. The editor is powered by CodeMirror 6 with Markdoc and MDX support for rich content authoring.
+
+## Target Users
+
+Engineering teams that need to maintain API documentation alongside their codebase. Organizations that want to automate documentation workflows and reduce manual maintenance overhead. Developer-focused companies looking for AI-assisted documentation tools that integrate with existing Git workflows.
