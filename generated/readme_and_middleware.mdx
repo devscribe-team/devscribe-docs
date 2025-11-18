@@ -1,0 +1,44 @@
+---
+title: Authentication Middleware
+icon: file-text
+---
+---
+
+## Middleware Overview
+
+The middleware (`src/middleware.ts`) handles authentication and route protection for the Next.js application. It intercepts requests to specific routes and validates JWT session tokens before allowing access.
+
+**Protected Routes:**
+- `/dashboard`, `/editor`, `/editor-old`, `/generate-docs`, `/generate-docs-old`, `/settings`, `/analytics`, `/updates`
+
+**Auth Routes:**
+- `/login`, `/signup`
+
+### Authentication Logic
+
+The middleware checks for a `jwt_session` cookie, decodes the JWT payload, and verifies the token hasn't expired by comparing the `exp` timestamp to the current time.
+
+<Callout type="info">
+The authentication flow validates both the presence and expiration of JWT tokens to ensure secure access to protected routes.
+</Callout>
+
+**Behavior:**
+- **Protected routes without valid session:** Redirects to `/login`
+- **Auth routes with valid session:** Redirects to `/dashboard` (except `/signup` which is allowed for onboarding)
+- **Valid session or unrestricted routes:** Request proceeds normally
+
+<Callout type="tip">
+The matcher configuration ensures middleware only runs on relevant paths, improving performance by avoiding unnecessary checks on static assets or API routes.
+</Callout>
+
+---
+
+## README
+
+The README is minimal and contains a troubleshooting section with one entry:
+
+**Issue:** Google/GitHub OAuth doesn't work
+
+<Callout type="warning">
+Set `NEXT_PUBLIC_DEVSCRIBE_BACKEND_URL=http://127.0.0.1:8000` in `.env` (must use `127.0.0.1`, not `localhost`)
+</Callout>
