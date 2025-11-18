@@ -1,51 +1,50 @@
-Based on my analysis of the devscribe-backend project, I can see this is a FastAPI-based backend service that handles documentation generation, authentication, GitHub integration, and related features. Here's the frontmatter:
+Based on my analysis of the devscribe-backend project, I can now provide the front matter. The project is a FastAPI backend for DevScribe, which is an AI-powered API documentation generation tool. It handles authentication, GitHub integration, and AI-powered API analysis.
 
 ---
-title: Backend Overview
+title: Project Overview
 icon: book
 ---
-## General Use
+Based on my analysis of the codebase, here's a brief overview of the project:
 
-DevScribe is an AI-native documentation platform that automatically generates, maintains, and publishes API documentation. The platform connects to your GitHub repositories, analyzes your codebase, and creates comprehensive documentation that updates automatically as your code evolves.
+## Overview
+
+DevScribe Backend is a FastAPI-based platform that automatically generates documentation for software projects by analyzing GitHub repositories using AI. The system extracts code structures, generates intelligent documentation, and deploys it to custom documentation sites.
 
 ## Core Functionality
 
-**Automated Documentation Generation**
+The platform processes GitHub repositories through an AI pipeline that:
 
-Connect your GitHub repository and select a documentation type (API Reference, Internal, or External). The AI analyzes your code and generates structured documentation instantly.
+- Analyzes codebases using Tree-sitter parsing to extract code chunks (functions, classes, components)
+- Stores code embeddings in Milvus vector database for semantic search
+- Generates documentation using LLMs with repository context
+- Tracks code changes via GitHub webhooks and updates documentation automatically
+- Deploys generated documentation to Vercel
 
-<Callout type="tip">
-The AI can detect your project's structure and technology stack to generate context-aware documentation that follows best practices for your specific framework.
-</Callout>
+## Key Features
 
-**Web-Based Editor**
+**Repository Analysis**: Chunks code files into semantic units, builds call graphs, and performs complexity analysis to identify critical functions.
 
-Edit documentation through a rich markdown editor with file tree navigation, syntax highlighting, and live preview. The editor supports standard markdown, MDX with React components, and Markdoc for advanced formatting.
+**AI Documentation Generation**: Creates internal docs, external docs, and API references by combining code analysis with LLM generation. Supports concurrent documentation generation with multi-threaded workers.
+
+**GitHub Integration**: OAuth authentication, webhook-based change detection, and automatic repository syncing. Supports GitHub App installation for accessing user repositories.
+
+**Change Tracking**: Monitors repository updates, identifies affected documentation, and stores changes in Google Cloud Storage for user review.
+
+**Deployment**: Integrates with Vercel for automated documentation site deployment with custom domains and theming.
+
+## Architecture
 
 <Callout type="info">
-The editor supports **three content formats**: standard Markdown for simple documentation, MDX for embedding React components, and Markdoc for advanced structured content.
+The system is built on a modular architecture with clear separation of concerns:
 </Callout>
 
-**Continuous Sync**
+- **Routes**: Authentication (OAuth + password), GitHub operations, theme/logo customization, and AI endpoints
+- **AI Features**: Modular services for chunking, vector search, documentation generation, call graph analysis, and repository processing
+- **Database**: Firestore for user data, Milvus for vector embeddings, Google Cloud Storage for documentation artifacts
+- **Middleware**: JWT-based authentication with session management
 
-Documentation automatically updates when code is pushed to GitHub. The platform monitors repository changes and regenerates relevant sections to keep docs in sync with your codebase.
+## Tech Stack
 
 <Callout type="success">
-Never worry about outdated documentation again. DevScribe automatically detects changes and updates the relevant sections while preserving your custom content.
+Built with FastAPI, Tree-sitter for code parsing, Anthropic/OpenAI LLMs for generation, Milvus for vector storage, and integrates with GitHub API and Vercel deployment API.
 </Callout>
-
-**Custom Publishing**
-
-Deploy documentation to Vercel or custom domains with configurable themes, color schemes, and branding. Each platform maintains its own published website.
-
-**Team Collaboration**
-
-Invite team members to collaborate on documentation with role-based permissions. Organizations can manage multiple platforms with separate teams and content repositories.
-
-## Technology Stack
-
-Built with Next.js 15, React 19, and TypeScript. Uses Supabase for authentication and data management, Google Cloud Storage for file storage, and integrates with GitHub for repository access and automated deployments. The editor is powered by CodeMirror 6 with Markdoc and MDX support for rich content authoring.
-
-## Target Users
-
-Engineering teams that need to maintain API documentation alongside their codebase. Organizations that want to automate documentation workflows and reduce manual maintenance overhead. Developer-focused companies looking for AI-assisted documentation tools that integrate with existing Git workflows.
