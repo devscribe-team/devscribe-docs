@@ -1,0 +1,17 @@
+---
+title: Backend Setup Guide
+icon: rocket
+---
+## Overview
+
+The devscribe-frontend repository contains the frontend application for DevScribies.
+
+## Configuration
+
+<Callout type="warning">
+The application requires specific environment configuration for OAuth authentication. Set `NEXT_PUBLIC_DEVSCRIBE_BACKEND_URL=http://127.0.0.1:8000` in your `.env` file (must use `127.0.0.1`, not `localhost`) to ensure Google and GitHub OAuth function correctly.
+</Callout>
+
+<CodeSnippet language="bash" title=".env">
+NEXT_PUBLIC_DEVSCRIBE_BACKEND_URL=http://127.0.0.1:8000
+</CodeSnippet>
