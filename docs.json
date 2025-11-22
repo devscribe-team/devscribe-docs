@@ -11,12 +11,18 @@
             "pages": [
               "introduction",
               "generated/overview",
+              "generated/readme_and_middleware",
+              "generated/readme",
+              "generated/poem",
               "generated/readme1",
               "generated/poem1",
               "generated/Generated_Document",
               "generated/test_readme",
               "generated/hi_prompt",
-              "generated/poem_prompt"
+              "generated/poem_prompt",
+"test_folder/file_test1",
+"test_folder/folder_test2/file_test2",
+"file_test3"
             ]
           },
           {
