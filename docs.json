@@ -10,7 +10,9 @@
             "group": "Get Started",
             "pages": [
               "introduction",
-              "generated/test1"
+              "generated/test1",
+              "generated/test2",
+              "generated/test3"
             ]
           },
           {
