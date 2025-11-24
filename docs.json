@@ -10,11 +10,6 @@
             "group": "Get Started",
             "pages": [
               "introduction",
-              "generated/overview",
-              "generated/readme1",
-              "generated/test_readme",
-              "generated/hi_prompt",
-              "generated/readme",
               "generated/test1"
             ]
           },
