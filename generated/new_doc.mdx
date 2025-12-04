@@ -1,0 +1,108 @@
+---
+title: One Pager Simple
+icon: file-text
+---
+Based on my exploration of the repository, this is a **DevScribe** documentation deployment template - a Next.js-based documentation platform with Markdoc support, AI-powered search using embeddings, and custom components. Let me create a concise one-pager:
+
+---
+
+## What is DevScribe?
+
+DevScribe is a Next.js-based documentation platform for creating, managing, and deploying technical documentation with AI-powered search capabilities.
+
+## Core Features
+
+**Markdown & Components** - Write in Markdown with custom Markdoc components including callouts, cards, accordions, tabs, and code groups.
+
+**AI-Powered Search** - RAG-based search using Gemini embeddings for context-aware answers. The chatbot retrieves relevant documentation and generates responses based on your content.
+
+**Fast & Modern** - Built on Next.js 15 with React 19, Tailwind CSS, and optimized for performance with server-side rendering.
+
+**Full-Text Search** - FlexSearch integration for instant keyword-based navigation through your documentation.
+
+## Quick Start
+
+<CodeGroup>
+  <CodeSnippet language="bash" title="Install">
+    npm install
+  </CodeSnippet>
+  
+  <CodeSnippet language="bash" title="Setup">
+    # Add Gemini API key to .env
+    GEMINI_API_KEY=your_key_here
+  </CodeSnippet>
+  
+  <CodeSnippet language="bash" title="Run">
+    # Generate embeddings and start dev server
+    npm run generate-embeddings
+    npm run dev
+  </CodeSnippet>
+</CodeGroup>
+
+## Architecture
+
+**Content Management** - All documentation lives in `src/app/(pages)` as `.md` files with frontmatter for metadata.
+
+**Build Process** - Generates search index and embeddings during build for optimal performance.
+
+**Navigation** - Configured via `docs.json` with support for tabs, groups, and nested pages.
+
+## Key Components
+
+<Callout type="info">
+DevScribe provides six callout types: `info`, `warning`, `error`, `success`, `tip`, `danger`.
+</Callout>
+
+**Code Groups** - Multi-language code examples with syntax highlighting and line numbers.
+
+**Cards & CardGroups** - Organize content with flexible layouts (1-3 columns), icons, and links.
+
+**Steps** - Sequential tutorials with rich content support including nested components.
+
+## AI Search Flow
+
+<Callout type="tip">
+The AI search uses a three-step process to deliver accurate, context-aware answers from your documentation.
+</Callout>
+
+**1. Embed Documentation** - Run `npm run generate-embeddings` to process all `.md` files and store vectors in `data/embeddings.json`.
+
+**2. User Query** - Questions submitted via the AskAI button are embedded using Gemini and compared against stored embeddings.
+
+**3. Context Retrieval** - Most relevant documents are identified via dot product similarity and passed to Gemini 2.5 Flash for response generation.
+
+## Deployment
+
+<Callout type="success">
+Deploy to Vercel with automatic builds. Embeddings and search index are regenerated on each deployment.
+</Callout>
+
+<CodeGroup>
+  <CodeSnippet language="bash" title="Build">
+    npm run build  # Generates embeddings, search index, and production build
+  </CodeSnippet>
+  
+  <CodeSnippet language="bash" title="Start">
+    npm start      # Runs production server
+  </CodeSnippet>
+</CodeGroup>
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Content**: Markdoc for enhanced Markdown
+- **AI**: Google Gemini for embeddings and chat
+- **Search**: FlexSearch for keyword search
+- **Styling**: Tailwind CSS 4 with Radix UI components
+- **Syntax**: Shiki for code highlighting
+
+## File Structure
+
+<CodeSnippet language="plaintext" showLineNumbers={true}>
+{`src/app/(pages)/       # Documentation content (.md files)
+src/components/        # React components
+src/lib/              # Utilities and helpers
+public/               # Static assets
+scripts/              # Build scripts for search and embeddings
+docs.json             # Navigation configuration`}
+</CodeSnippet>

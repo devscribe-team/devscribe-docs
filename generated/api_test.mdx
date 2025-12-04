@@ -1,0 +1,196 @@
+---
+title: Creating a Platform
+icon: rocket
+api: POST /github/create-platform
+num: 2
+---
+---
+
+## POST /github/create-platform
+
+Creates a new platform for an organization by setting up all necessary infrastructure including GitHub repositories, Vercel deployment, and documentation storage.
+
+<CodeGroup>
+    <CodeSnippet language="javascript" title="JavaScript">
+    {`const url = 'https://api.devscribe.com/github/create-platform';
+const options = {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <session_token>',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    gh_installation_id: '12345678',
+    platform_id: 'my-platform-uuid',
+    platform_name: 'my-awesome-platform',
+    org_id: 'org-uuid-123'
+  })
+};
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}`}
+    </CodeSnippet>
+
+    <CodeSnippet language="python" title="Python">
+    {`import requests
+
+url = 'https://api.devscribe.com/github/create-platform'
+headers = {
+    'Authorization': 'Bearer <session_token>',
+    'Content-Type': 'application/json'
+}
+payload = {
+    'gh_installation_id': '12345678',
+    'platform_id': 'my-platform-uuid',
+    'platform_name': 'my-awesome-platform',
+    'org_id': 'org-uuid-123'
+}
+
+response = requests.post(url, headers=headers, json=payload)
+print(response.json())`}
+    </CodeSnippet>
+
+    <CodeSnippet language="curl" title="cURL">
+    {`curl -X POST https://api.devscribe.com/github/create-platform \\
+  -H "Authorization: Bearer <session_token>" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "gh_installation_id": "12345678",
+    "platform_id": "my-platform-uuid",
+    "platform_name": "my-awesome-platform",
+    "org_id": "org-uuid-123"
+  }'`}
+    </CodeSnippet>
+</CodeGroup>
+
+<CodeGroup>
+    <CodeSnippet language="json" title="200 Success">
+    {`{
+  "message": "Repository created successfully and deployed",
+  "vercel_deployment_url": "https://deployment-repo-my-platform-uuid.vercel.app",
+  "vercel_deployment_id": "dpl_abc123xyz",
+  "vercel_project_id": "prj_xyz789abc"
+}`}
+    </CodeSnippet>
+
+    <CodeSnippet language="json" title="400 Bad Request">
+    {`{
+  "message": "Failed to store GitHub installation info: <error details>"
+}`}
+    </CodeSnippet>
+
+    <CodeSnippet language="json" title="401 Unauthorized">
+    {`{
+  "detail": "Unauthorized"
+}`}
+    </CodeSnippet>
+
+    <CodeSnippet language="json" title="500 Internal Server Error">
+    {`{
+  "message": "Failed to generate access token"
+}`}
+    </CodeSnippet>
+</CodeGroup>
+
+### Description
+
+This endpoint orchestrates the complete setup of a new platform within the Devscribe ecosystem. It performs multiple operations in sequence to establish the infrastructure needed for documentation hosting and deployment.
+
+### Authentication
+
+<Callout type="warning">
+**Required**: Yes
+
+This endpoint requires an active authenticated session. The user must be logged in and have appropriate permissions for the specified organization.
+</Callout>
+
+### Request Body
+
+The request must include a JSON body with the following fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `gh_installation_id` | string | Yes | The GitHub App installation ID for the organization |
+| `platform_id` | string | Yes | Unique identifier for the platform (typically a UUID) |
+| `platform_name` | string | Yes | Human-readable name for the platform |
+| `org_id` | string | Yes | The organization ID to associate this platform with |
+
+### Response
+
+#### Success Response (200)
+
+Returns a JSON object containing deployment information:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Success message indicating repository creation and deployment status |
+| `vercel_deployment_url` | string | The live URL where the documentation is deployed |
+| `vercel_deployment_id` | string | Unique identifier for the Vercel deployment |
+| `vercel_project_id` | string | Unique identifier for the Vercel project |
+
+#### Error Responses
+
+<Callout type="error">
+**400 Bad Request**: Returned when there's an error in one of the setup steps (storing GitHub info, creating repos, seeding docs, creating Vercel project, setting environment variables, or triggering deployment)
+
+**401 Unauthorized**: Returned when the user is not authenticated
+
+**500 Internal Server Error**: Returned when access token generation fails
+</Callout>
+
+### What This Endpoint Does
+
+The endpoint performs the following operations in sequence:
+
+1. **Store GitHub Installation Info**: Associates the GitHub installation ID with the organization in the database
+2. **Generate Access Token**: Creates a GitHub installation access token for API operations
+3. **Create Deployment Repository**: Creates a private deployment repository (`deployment-repo-{platform_id}`) in the `devscribe-team` organization using the deployment template
+4. **Create Starter Repository**: Creates a public documentation repository (`{platform_name}-docs`) in the user's GitHub account/organization using the starter template
+5. **Seed GCP Documentation Storage**: Initializes Google Cloud Platform storage for documentation files associated with the platform
+6. **Create Vercel Project**: Sets up a new Vercel project linked to the deployment repository with Next.js framework configuration
+7. **Set Environment Variables**: Configures necessary environment variables in the Vercel project
+8. **Trigger Initial Deployment**: Initiates the first production deployment to Vercel
+
+### Implementation Details
+
+<Callout type="info">
+**File Location**: `app/routes/github.py:1458-1526`
+
+**Dependencies**:
+- `app.utils.github.store_gh_org_id`: Stores GitHub organization information
+- `generate_token()`: Generates GitHub installation access tokens
+- `create_deployment_repo()`: Creates the deployment repository from template
+- `create_starter_repo()`: Creates the starter documentation repository
+- `seed_gcp_docs()`: Initializes GCP documentation storage
+- `VercelDeploymentHandler`: Handles all Vercel-related operations
+</Callout>
+
+### Usage Notes
+
+<Callout type="tip">
+- The platform name is used as the prefix for the documentation repository (e.g., `my-platform-docs`)
+- The platform ID is used as the suffix for the deployment repository (e.g., `deployment-repo-abc123`)
+- The deployment repository is created in the `devscribe-team` organization and is private
+- The starter repository is created in the user's GitHub account/organization and is public
+- All operations are performed synchronously; if any step fails, an error is returned immediately
+- The endpoint will return specific error messages indicating which step failed
+</Callout>
+
+### Rate Limiting
+
+<Callout type="warning">
+This endpoint is protected by the application's rate limiting middleware (10 requests per minute per user).
+</Callout>
+
+### Related Endpoints
+
+- `POST /github/docs/push` - Push documentation files to the repository
+- `GET /github/repos` - Get all accessible GitHub repositories
+- `GET /github/connect` - Connect GitHub account to Devscribe
+
+---
