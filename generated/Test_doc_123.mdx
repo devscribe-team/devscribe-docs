@@ -1,0 +1,61 @@
+---
+title: PR Summary with Components
+icon: file-text
+---
+# Summary
+
+This PR separates API documentation generation into a dedicated flow with specialized functions and enhanced prompts.
+
+## Key Changes
+
+### New API-Specific Functions
+
+Two new functions were added to handle API documentation generation:
+
+<CodeSnippet language="python" title="add_frontmatter_api()">
+# Generates frontmatter for API docs including title, icon, HTTP method, 
+# route path, and page number
+# Location: app/features/MCP/claude.py:259
+</CodeSnippet>
+
+<CodeSnippet language="python" title="components_rewrite_api()">
+# Enhances API documentation with MDX components while preserving 
+# existing code groups
+# Location: app/features/MCP/claude.py:343
+</CodeSnippet>
+
+### Enhanced API Documentation Prompt
+
+<Callout type="info">
+The `get_api_docs_prompt()` function now includes improved formatting instructions for API documentation.
+</Callout>
+
+The enhanced prompt provides:
+
+- Instructions to generate two code groups at the top: one for request examples (curl/Python/JavaScript) and one for response examples (200, 400, etc.)
+- Detailed examples showing proper CodeGroup and CodeSnippet component usage
+- Explicit formatting rules for handling curly braces in MDX
+
+### Routing Logic
+
+<Callout type="tip">
+The `streaming_claude_main()` function now accepts an `api` parameter to route between standard and API-specific processing flows (app/features/MCP/claude.py:623). When `type == 3`, the API flow is triggered (app/features/MCP/client.py:762).
+</Callout>
+
+### Improved Robustness
+
+<Callout type="success">
+Enhanced reliability with better error handling and response processing.
+</Callout>
+
+- Enhanced regex pattern matching to remove explanatory text from agent responses
+- Additional safeguards against agents adding conversational phrases like "There you go" or "I'll"
+- Better handling of missing frontmatter with fallback defaults
+
+## Files Changed
+
+<CodeSnippet language="bash" title="Diff Summary">
+app/features/MCP/claude.py   | +213 -24
+app/features/MCP/prompts.py  | +148 -54
+app/features/MCP/client.py   |   +5 -1
+</CodeSnippet>
